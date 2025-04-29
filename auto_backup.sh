@@ -1,39 +1,27 @@
 #!/bin/bash
 
-# Auto backup by snifade
+echo -n "Enter the source directory for backup: "
+read source_dir
 
+echo -n "Enter the destination to store backup: "
+read dest_dir
 
+# Get date and time
+date_stamp=$(date +%Y-%m-%d)
+time_stamp=$(date +%H-%M-%S)
 
-# Asks the user for the backup dir
+# Build full path
+backup_path="$dest_dir/Backup_${date_stamp}/${time_stamp}.tar.gz"
 
-read -p "Enter the source directory for backup: " SOURCE_DIR
+# 🔧 Create the parent directory first
+mkdir -p "$(dirname "$backup_path")"
 
-read -p "Enter the destinationn to store backup: " DEST_DIR
+echo "[INFO] Backing up $source_dir to $backup_path"
 
-
-# Timestamp
-
-TIMESTAMP=$(date +"%Y-%m-%D-%H-%M-%S")
-
-BACKUP_FILE="Backup_${TIMESTAMP}.tar.gz"
-
-
-# Logs
-
-LOG_FILE="$DEST_DIR/backup_log.txt"
-
-
-# Create Backup
-
-echo "[INFO] Backing up $SOURCE_DIR to $DEST_DIR/$BACKUP_FILE"
-
-tar -czf "$DEST_DIR/$BACKUP_FILE" "$SOURCE_DIR" 2>> "$LOG_FILE"
-
-# Check if successful
-
-if [ $? -eq 0 ]; then
-	echo "[SUCCESS] Backup completed at $TIMESTAMP" | tee -a "$LOG_FILE"
-else 
-	echo "[ERROR] Backup failed at $TIMESTAMP" | tee -a "$LOG_FILE"
+# 🗃️ Run the backup
+if tar -czf "$backup_path" "$source_dir" 2>/dev/null; then
+    echo "[SUCCESS] Backup completed at $backup_path"
+else
+    echo "[ERROR] Backup failed at $backup_path"
 fi
 
